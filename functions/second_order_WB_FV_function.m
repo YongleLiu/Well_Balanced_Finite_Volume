@@ -5,11 +5,7 @@
 % 
 % AUTHOR OF THE CODE: SERGIO P. PEREZ
 %
-<<<<<<< Updated upstream
-% COAUTHORS: JOSÉ A. CARRILLO, SERAFIM KALLIADASIS, CHI-WANG SHU
-=======
 % COAUTHORS: JOSï¿½ A. CARRILLO, SERAFIM KALLIADASIS, CHI-WANG SHU
->>>>>>> Stashed changes
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -53,7 +49,7 @@
 
 
 
-function [dUdt]= second_order_WB_FV_function(x,deltax,U,pd,nu,cik,alpha,cep,a,b,cefrHR,M,gamma,cCS,bc)
+function [dUdt,H]= second_order_WB_FV_function(x,deltax,U,pd,nu,cik,alpha,cep,a,b,cefrHR,M,gamma,cCS,bc)
 
 n=length(U)/2;
 
@@ -61,17 +57,6 @@ n=length(U)/2;
 if bc==2 % Periodic boundary conditions in both density and momentum
     U=[U(n-2);U(1:n-2);U(1);U(2*n-4);U(n-1:2*n-4);U(n-1)];
     x=[x(end);x;x(1)];
-<<<<<<< Updated upstream
-    deltax=[deltax(end);deltax;deltax(1)];
-elseif bc==3 % Periodic boundary conditions in density and reflective in momentum
-    U=[U(n-2);U(1:n-2);U(1);U(n-1)/U(1)*U(n-2);U(n-1:2*n-4);U(2*n-4)/U(n-2)*U(1)];
-    x=[x(end);x;x(1)];
-    deltax=[deltax(end);deltax;deltax(1)];
-elseif bc==4 % Reflective boundary conditions in density and momentum
-    U=[U(1);U(1:n-2);U(n-2);U(n-1);U(n-1:2*n-4);U(2*n-4)];
-    x=[x(1);x;x(end)];
-    deltax=[deltax(1);deltax;deltax(end)];
-=======
    deltax=[deltax(end);deltax;deltax(1)];
 elseif bc==3 % Periodic boundary conditions in density and reflective in momentum
     U=[U(n-2);U(1:n-2);U(1);U(n-1)/U(1)*U(n-2);U(n-1:2*n-4);U(2*n-4)/U(n-2)*U(1)];
@@ -81,7 +66,6 @@ elseif bc==4 % Reflective boundary conditions in density and momentum
     U=[U(1);U(1:n-2);U(n-2);U(n-1);U(n-1:2*n-4);U(2*n-4)];
     x=[x(1);x;x(end)];
    deltax=[deltax(1);deltax;deltax(end)];
->>>>>>> Stashed changes
 end
 %--------------------------------------------------------------------------
 % Evaluation of H(x,\rho): the part of the variation of the free energy 
@@ -98,6 +82,7 @@ elseif cik==1
 elseif cik==2
     Wconvrho=Wgaussianconvrhofunction(x,U(1:n),deltax);
 end
+
 
 % b) External potential V(x)
 
@@ -116,6 +101,7 @@ elseif cep==1
     % V=1/6*exp(-x.^2/6);
 end
 
+
 % c) Hard rods excessive free energy
 
 if cefrHR==0
@@ -127,6 +113,8 @@ end
 % d) Add all the terms to form H(x,\rho)
 
 H=Wconvrho+V+HR;
+
+
 
 %--------------------------------------------------------------------------
 % Construction of left and right values of the variable vector U at the 
@@ -185,17 +173,12 @@ if pd>1
 %        
 
 elseif pd==1
-<<<<<<< Updated upstream
-      Uiplushalfplus(1:n)=circshift(rhoil,-1).*exp((-max(Hir,circshift(Hil,-1))+circshift(Hil,-1))./nu);
-      Uiplushalfminus(1:n)=rhoir.*exp((-max(Hir,circshift(Hil,-1))+Hir)./nu);
-=======
 %         Uiplushalfplus(1:n)=circshift(rhoil,-1).*exp((-max(Hir,circshift(Hil,-1))+circshift(Hil,-1))./nu);
 %         Uiplushalfminus(1:n)=rhoir.*exp((-max(Hir,circshift(Hil,-1))+Hir)./nu);
 
 
        Uiplushalfplus(1:n)=exp(-max(Hir,circshift(Hil,-1))+circshift(PiHil,-1));  %%%add by YL
        Uiplushalfminus(1:n)=exp(-max(Hir,circshift(Hil,-1))+PiHir);
->>>>>>> Stashed changes
 end
 
 if bc==1 % Implement no flux conditions with bc==1
@@ -203,11 +186,6 @@ if bc==1 % Implement no flux conditions with bc==1
 Uiplushalfplus(n)=0;
 Uiplushalfminus(n)=0;
 end
-<<<<<<< Updated upstream
- 
-Uiplushalfplus(n+1:2*n)=Uiplushalfplus(1:n).*circshift(U(n+1:2*n)./U(1:n),-1);
-Uiplushalfminus(n+1:2*n)=Uiplushalfminus(1:n).*U(n+1:2*n)./U(1:n);
-=======
 
 % Fix mistake in following lines! It should have uir and uil
 
@@ -217,7 +195,6 @@ Uiplushalfminus(n+1:2*n)=Uiplushalfminus(1:n).*U(n+1:2*n)./U(1:n);
 %Correction could be:
 Uiplushalfplus(n+1:2*n)=Uiplushalfplus(1:n).*circshift(uil,-1);
 Uiplushalfminus(n+1:2*n)=Uiplushalfminus(1:n).*uir;
->>>>>>> Stashed changes
 
 %--------------------------------------------------------------------------
 % Consturction of numerical flux whose inputs are the plus and minus values
@@ -270,7 +247,7 @@ Uiplushalfminus(n+1:2*n)=Uiplushalfminus(1:n).*uir;
 % Construction of source term
 %--------------------------------------------------------------------------  
 
-
+S=zeros(2*n,1);
   Sic=zeros(n,1);
   
 
@@ -279,18 +256,8 @@ Uiplushalfminus(n+1:2*n)=Uiplushalfminus(1:n).*uir;
           Siplushalfminus=1./deltax.*(nu*Uiplushalfminus(1:n).^pd-nu*rhoir.^pd);
           
           Siminushalfplus=1./deltax.*(nu*rhoil.^pd-nu*circshift(Uiplushalfplus(1:n),+1).^pd);
+         
           
-<<<<<<< Updated upstream
-%                      rhoilaver=max(rhoil-0.25*(Hir+Hil)+0.5*Hil,0);
-%                    rhoiraver=max(rhoir-0.25*(Hir+Hil)+0.5*Hir,0);
-                    
-           rhoilaver=rhoil-(Hir+Hil)/2/pd+Hil/pd;
-          rhoiraver=rhoir-(Hir+Hil)/2/pd+Hir/pd;
-          
-           Sic=1/deltax*(rhoir.^pd-rhoiraver.^pd-rhoil.^pd+rhoilaver.^pd);
-%           Sic=-1/deltax*(rhoil+rhoir)/2.*(Hir-Hil);
-      elseif choicepressure==1
-=======
         
                     
 %            rhoilaver=rhoil-(Hir+Hil)/2/pd+Hil/pd;
@@ -302,11 +269,9 @@ Uiplushalfminus(n+1:2*n)=Uiplushalfminus(1:n).*uir;
            Sic=1./deltax.*(rhoir.^pd-rhoiraver.^pd-rhoil.^pd+rhoilaver.^pd);
 
       elseif pd==1
->>>>>>> Stashed changes
           
-          Siplushalfminus=1/deltax*(Uiplushalfminus(1:n)-rhoir);
-          
-          Siminushalfplus=1/deltax*(rhoil-circshift(Uiplushalfplus(1:n),+1));
+          Siplushalfminus=1./deltax.*(Uiplushalfminus(1:n)-rhoir);
+          Siminushalfplus=1./deltax.*(rhoil-circshift(Uiplushalfplus(1:n),+1));
           
 %           rhoilaver=rhoil.*exp(-0.5*(Hir+Hil)+Hil);
 %           rhoiraver=rhoir.*exp(-0.5*(Hir+Hil)+Hir);
@@ -314,7 +279,7 @@ Uiplushalfminus(n+1:2*n)=Uiplushalfminus(1:n).*uir;
            rhoilaver=exp(-0.5*(Hir+Hil)+PiHil);  %%%add by YL
           rhoiraver=exp(-0.5*(Hir+Hil)+PiHir);
 %           
-          Sic=1/deltax*(rhoir-rhoiraver-rhoil+rhoilaver);
+          Sic=1./deltax.*(rhoir-rhoiraver-rhoil+rhoilaver);
 
           
           
@@ -323,28 +288,18 @@ Uiplushalfminus(n+1:2*n)=Uiplushalfminus(1:n).*uir;
       S(n+1:2*n)=Siplushalfminus+Siminushalfplus+Sic-gamma*U(1+n:2*n);
 
 if cCS==1
-<<<<<<< Updated upstream
-    S(n+1:2*n)=S(n+1:2*n)-CSconvfunction(x,U(1:n),U(n+1:2*n),deltax);
-end
-
-=======
     uu=desingula(U(n+1:2*n),U(1:n));
     CSconv=CSconvfunction(x,U(1:n),uu);
     S(n+1:2*n)=S(n+1:2*n)-CSconv';
 end
 
 
->>>>>>> Stashed changes
 %--------------------------------------------------------------------------
 % Finally, computation of the temporal derivative of the variables U
 %--------------------------------------------------------------------------  
 
 dUdt=-1./[deltax;deltax].*(F_iplushalf-F_iminushalf)+S;
-<<<<<<< Updated upstream
-  
-=======
 
->>>>>>> Stashed changes
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
@@ -354,7 +309,18 @@ dUdt=-1./[deltax;deltax].*(F_iplushalf-F_iminushalf)+S;
 
     function conv=Wconvrhofunction(x,rho,alpha,deltax)   
         if alpha==0 % For convention W(x)=ln(x)
-           conv=sum(log((repmat(x',length(x),1)-x)).*rho.*deltax); 
+           %conv=sum(log((repmat(x',length(x),1)-x)).*rho.*deltax)';
+           %corrected as below
+           conv=zeros(n,1);   %%add by YL
+           for i=1:n
+             for j=1:n
+                 if(abs(x(i)-x(j))<1e-12)
+                     conv(i)=conv(i)+0;
+                 else
+                    conv(i)=conv(i)+deltax(j)*(log(abs(x(i)-x(j))))*rho(j);
+                 end
+             end
+           end
         elseif alpha>0
             conv=sum(abs((repmat(x',length(x),1)-x)).^alpha./alpha.*rho.*deltax)';
         elseif alpha<0 % Singularity treated by solving the integral analytically
@@ -467,7 +433,7 @@ dUdt=-1./[deltax;deltax].*(F_iplushalf-F_iminushalf)+S;
 %           conv(n/2+1:end)=flipud(conv(1:n/2));
 %           conv=conv';
       end
-  
+                           
       function conv=kderconvrhofunction(x,rho)
           deltaxk=x(2)-x(1);
           conv=deltaxk*sum((repmat(x',length(x),1)-x).*rho);
